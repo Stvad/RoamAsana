@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pprint
 from sys import argv
+from datetime import datetime
 from typing import *
 
 from dataclasses_json import dataclass_json
@@ -64,6 +65,13 @@ def get_bracket_number(task_name):
     return None
 
 
+def custom_strftime(date_format, date):
+    def suffix(day):
+        return 'th' if 11 <= day <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
+
+    return date.strftime(date_format).replace('{S}', str(date.day) + suffix(date.day))
+
+
 def extract_children(task_json):
     def bracket_estimate(estimate_property="asana_pomodoro_estimate"):
         bracket_number = get_bracket_number(task_json['name'])
@@ -72,8 +80,12 @@ def extract_children(task_json):
     def notes():
         return [Block(task_json['notes'])] if task_json['notes'] else []
 
+    def due_date_tag():
+        return custom_strftime('[[%B {S}, %Y]]', datetime.fromisoformat(task_json['due_on'])) \
+            if task_json['due_on'] else ''
+
     def tags():
-        tag_str = seq(task_json['tags']).map(lambda it: f"[[{it['name']}]]").make_string(' ')
+        tag_str = due_date_tag() + ' ' + seq(task_json['tags']).map(lambda it: f"[[{it['name']}]]").make_string(' ')
         return [Block(tag_str)] if tag_str else []
 
     return tags() + bracket_estimate() + notes() + convert_tasks(task_json['subtasks'])
