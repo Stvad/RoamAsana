@@ -81,11 +81,12 @@ def extract_children(task_json):
         return [Block(task_json['notes'])] if task_json['notes'] else []
 
     def due_date_tag():
-        return custom_strftime('[[%B {S}, %Y]]', datetime.fromisoformat(task_json['due_on'])) \
-            if task_json['due_on'] else ''
+        return [custom_strftime('%B {S}, %Y', datetime.fromisoformat(task_json['due_on']))] \
+            if task_json['due_on'] else []
 
     def tags():
-        tag_str = due_date_tag() + ' ' + seq(task_json['tags']).map(lambda it: f"[[{it['name']}]]").make_string(' ')
+        tag_names = seq(due_date_tag()) + seq(task_json['tags']).map(lambda it: it['name'])
+        tag_str = tag_names.map(lambda it: f"[[{it}]]").make_string(' ')
         return [Block(tag_str)] if tag_str else []
 
     return tags() + bracket_estimate() + notes() + convert_tasks(task_json['subtasks'])
