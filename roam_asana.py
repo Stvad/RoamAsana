@@ -3,10 +3,9 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from pathlib import Path
-from pprint import pprint
-from sys import argv
 from datetime import datetime
+from pathlib import Path
+from sys import argv
 from typing import *
 
 from dataclasses_json import dataclass_json
@@ -35,8 +34,10 @@ def main():
     asana = json.load(input_path.open())
 
     root_page = Page(input_path.stem, convert_tasks(asana['data']))
-    pprint(root_page.to_json())
-    Path(argv[2]).write_text(f"[{root_page.to_json()}]")
+    json_str = root_page.to_json(indent=2)
+    print(json_str)
+
+    Path(argv[2]).write_text(f"[{json_str}]")
 
 
 def roam_string(task_json):
