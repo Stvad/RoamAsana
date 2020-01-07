@@ -14,3 +14,11 @@ Converts
 2. Run `python roam_asana.py ProjectName.json output.json`
 
 3. Import the resulting JSON file to Roam
+
+## Details
+
+1. Task notes are inserted as a child block
+1. Subtask become child blocks
+1. Tags and due dates are converted into Roam pages and inserted as a first child block under the respective task block
+1. Sections are supported and tasks that are in a section are aggregated under the same block
+1. This also supports converting [Asana bracket estimate hack](https://github.com/Stvad/RoamAsana) into Roam attribute
